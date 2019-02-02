@@ -12,9 +12,19 @@ class ToDoListViewController: UITableViewController {
 
     var itemArray = ["Find Mike", "Buy Eggs", "Destroy Mordor"]
     
+    //inicializar variable para almacenar user defaults
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        //igualar las preferncias de usuario al array que teniamos para mostrar el ultimo elemento guaradado en el array
+            if let items = defaults.array(forKey: "ToDoArray") as? [String]//buscar el array dentro de dafaults que tiene la key: "ToDoArray"
+                {
+                    itemArray = items
+                }
+        
     }
 
     //MARK - Tableview Datasource methods
@@ -71,6 +81,9 @@ class ToDoListViewController: UITableViewController {
             //Lo que sucedera cuando el usuario presione el boton
             //unwrapped porque aunque el textfield este vacio, nunca serà nil
             self.itemArray.append(textField.text!)
+            
+            //Almacenar nuevo valor en userdafults para no perderlo
+            self.defaults.set(self.itemArray, forKey: "ToDoArray")
             
             //reloadData para que se cargue el nuevo item del array y se muestre en el tableView
             self.tableView.reloadData()
