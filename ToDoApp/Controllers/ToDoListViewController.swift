@@ -10,8 +10,9 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
 
-    var itemArray = ["Find Mike", "Buy Eggs", "Destroy Mordor"]
-    
+    //var itemArray = ["Find Mike", "Buy Eggs", "Destroy Mordor"]
+    var itemArray = [Item]()
+
     //inicializar variable para almacenar user defaults
     let defaults = UserDefaults.standard
     
@@ -19,11 +20,26 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        
+        
+        let newItem = Item()
+        newItem.title = "pony"
+        itemArray.append(newItem)
+        
+        let newItem2 = Item()
+        newItem2.title = "titi"
+        itemArray.append(newItem2)
+        
+        let newItem3 = Item()
+        newItem3.title = "cadi"
+        itemArray.append(newItem3)
+        
         //igualar las preferncias de usuario al array que teniamos para mostrar el ultimo elemento guaradado en el array
-            if let items = defaults.array(forKey: "ToDoArray") as? [String]//buscar el array dentro de dafaults que tiene la key: "ToDoArray"
-                {
-                    itemArray = items
-                }
+         if let items = defaults.array(forKey: "ToDoArray") as? [Item] //buscar el array dentro de dafaults que tiene la key: "ToDoArray"
+         {
+            itemArray = items
+         }
+        
         
     }
 
@@ -40,16 +56,38 @@ class ToDoListViewController: UITableViewController {
         
         //indexpath es lo que la celda busca rellenar
         //igualamos el indexpath (numerodecolumna) al numero de elemento del array para que el primer elemento se escriba en la primera columna etc.
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = itemArray[indexPath.row].title
         
+        /*if itemArray[indexPath.row].done == true {
+            cell.accessoryType = .checkmark
+        }else{
+            cell.accessoryType = .none
+        }
+        */
+        
+        //operador ternario: (En este caso, determinar el valor de cell.accesoryType de acuerdo a si .done es true o false. Si es true poner checkmark, si no, none )
+        cell.accessoryType = itemArray[indexPath.row].done ? .checkmark : .none
         return cell
+        
     }
     
     //MARK - Delegates
     //Que sucedera si se selecciona una cell en el indexpath especificado
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        //imprimir el item del array que corresponda al numero de la fila seleccionada
+        
+        /*if itemArray[indexPath.row].done == false{
+            
+            itemArray[indexPath.row].done = true
+        } else{
+            itemArray[indexPath.row].done = false
+            
+        }*/
+        
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        
+        /*imprimir el item del array que corresponda al numero de la fila seleccionada
         print(itemArray[indexPath.row])
         
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark{
@@ -59,7 +97,9 @@ class ToDoListViewController: UITableViewController {
             
             //Agregar checkmark cuando se selecciona un row
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        }*/
+        
+        tableView.reloadData()
         
         //al seleccionar, hacer que no continue el color de seleccionado sobre la fila y en lugar de eso, desaparezca
         tableView.deselectRow(at: indexPath, animated: true)
@@ -78,9 +118,13 @@ class ToDoListViewController: UITableViewController {
         //Crear accion para el alert, boton que se presionará cuando se termine de crear el nuevo item
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
-            //Lo que sucedera cuando el usuario presione el boton
-            //unwrapped porque aunque el textfield este vacio, nunca serà nil
-            self.itemArray.append(textField.text!)
+            /*Lo que sucedera cuando el usuario presione el boton
+            unwrapped porque aunque el textfield este vacio, nunca serà nil
+            self.itemArray.append(textField.text!)*/
+            
+            let newItem = Item()
+            newItem.title = textField.text!
+            self.itemArray.append(newItem)
             
             //Almacenar nuevo valor en userdafults para no perderlo
             self.defaults.set(self.itemArray, forKey: "ToDoArray")
