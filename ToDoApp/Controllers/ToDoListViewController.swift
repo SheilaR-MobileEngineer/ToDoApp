@@ -12,33 +12,32 @@ class ToDoListViewController: UITableViewController {
 
     //var itemArray = ["Find Mike", "Buy Eggs", "Destroy Mordor"]
     var itemArray = [Item]()
-
-    //inicializar variable para almacenar user defaults
-    let defaults = UserDefaults.standard
+    
+    
+    //Crear un plist para almacenar la info apartir de la ubicacion de la app
+    
+    let file = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+    
+   
+    
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+   //print(dataFilePath)
+    /*inicializar variable para almacenar user defaults
+    let defaults = UserDefaults.standard*/
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+         print(file)
         
+        loadItems()
         
-        
-        let newItem = Item()
-        newItem.title = "pony"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "titi"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "cadi"
-        itemArray.append(newItem3)
-        
-        //igualar las preferncias de usuario al array que teniamos para mostrar el ultimo elemento guaradado en el array
+        /*igualar las preferncias de usuario al array que teniamos para mostrar el ultimo elemento guaradado en el array
          if let items = defaults.array(forKey: "ToDoArray") as? [Item] //buscar el array dentro de dafaults que tiene la key: "ToDoArray"
          {
             itemArray = items
-         }
+         }*/
         
         
     }
@@ -58,15 +57,13 @@ class ToDoListViewController: UITableViewController {
         //igualamos el indexpath (numerodecolumna) al numero de elemento del array para que el primer elemento se escriba en la primera columna etc.
         cell.textLabel?.text = itemArray[indexPath.row].title
         
-        /*if itemArray[indexPath.row].done == true {
+        if itemArray[indexPath.row].done == true {
             cell.accessoryType = .checkmark
         }else{
             cell.accessoryType = .none
         }
-        */
+
         
-        //operador ternario: (En este caso, determinar el valor de cell.accesoryType de acuerdo a si .done es true o false. Si es true poner checkmark, si no, none )
-        cell.accessoryType = itemArray[indexPath.row].done ? .checkmark : .none
         return cell
         
     }
@@ -86,7 +83,7 @@ class ToDoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-        
+        saveItems()
         /*imprimir el item del array que corresponda al numero de la fila seleccionada
         print(itemArray[indexPath.row])
         
@@ -95,9 +92,10 @@ class ToDoListViewController: UITableViewController {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
         }else{
             
-            //Agregar checkmark cuando se selecciona un row
+        //Agregar checkmark cuando se selecciona un row
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         }*/
+        
         
         tableView.reloadData()
         
@@ -126,8 +124,18 @@ class ToDoListViewController: UITableViewController {
             newItem.title = textField.text!
             self.itemArray.append(newItem)
             
-            //Almacenar nuevo valor en userdafults para no perderlo
-            self.defaults.set(self.itemArray, forKey: "ToDoArray")
+            /*Almacenar nuevo valor en userdafults para no perderlo
+            self.defaults.set(self.itemArray, forKey: "ToDoArray")*/
+            
+            let encoder = PropertyListEncoder()
+            
+            do{
+                let data = try encoder.encode(self.itemArray)
+                try data.write(to: self.dataFilePath!)
+            } catch{
+                 print("Error encoding, \(error)")
+            }
+            
             
             //reloadData para que se cargue el nuevo item del array y se muestre en el tableView
             self.tableView.reloadData()
@@ -147,6 +155,40 @@ class ToDoListViewController: UITableViewController {
         
         //Show alert
         present(alert, animated: true, completion: nil)
+        
+        saveItems()
     }
-}
+    
+    //MARK - Model manipulation methods
+    
+    func saveItems(){
+        
+        //Para codificar y poder guardar en el plist
+        let encoder = PropertyListEncoder()
+        
+        do{
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch{
+            print("Error encoding, \(error)")
+        }
+    }
+    
+    func loadItems(){
+        
+        //Crear variable con los contenidos de la sig url:
+        let data = try? Data(contentsOf: dataFilePath!)
+        let decoder = PropertyListDecoder()
+        
+        //decodificar datos en el plist y guaradarlos en el array. Son del tipo [Item] y se rescataran de data (arriba)
+        do{
+            itemArray = try decoder.decode([Item].self, from: data!)
+        } catch {
+            
+            print(error)
+        }
+        
+    
+    }
 
+}
