@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     //Inicia al cargarse la aplicacion
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+        print(Realm.Configuration.defaultConfiguration.fileURL)
+        
+        let data = Data()
+        data.name = "Sheila"
+        data.age = 28
+        
+        do{
+            //inicializar realm
+            let realm = try Realm()
+            //commit a la database:
+            try realm.write {
+                //añadir objeto data a la DB
+                realm.add(data);
+            }
+        }catch{
+            print("Error initialisinf¡g new realm, \(error)")
+        }
+        
         // Override point for customization after application launch.
         return true
     }
