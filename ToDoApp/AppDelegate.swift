@@ -20,18 +20,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
-        let data = Data()
-        data.name = "Sheila"
-        data.age = 28
+        
         
         do{
             //inicializar realm
             let realm = try Realm()
             //commit a la database:
-            try realm.write {
+            //try realm.write {
                 //añadir objeto data a la DB
-                realm.add(data);
-            }
+                //realm.add(data);
+            //}
         }catch{
             print("Error initialisinf¡g new realm, \(error)")
         }

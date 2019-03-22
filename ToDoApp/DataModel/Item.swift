@@ -2,15 +2,21 @@
 //  Item.swift
 //  ToDoApp
 //
-//  Created by Sheila Rodríguez on 2/3/19.
+//  Created by Sheila Rodríguez on 3/3/19.
 //  Copyright © 2019 Sheila Rodríguez. All rights reserved.
 //
 
 import Foundation
+import RealmSwift
 
-//Hacer la clase encodable y decodable con: CODABLE para que pueda ser encodable en json etc.
-class Item: Codable{
+class Item : Object{
+    @objc dynamic var title : String = ""
+    @objc dynamic var done : Bool = false
+    @objc dynamic var dateCreated : Date?
     
-    var title : String = ""
-    var done : Bool = false
+    //Define relacion uno a muchos con las categorias
+    var parentCategory = LinkingObjects(fromType: Category.self, property: "items")
+    
+    //Property = nombre de la variable de "Item" que se utilizará
+    //Category.self = objetos de category del tipo Category(self)
 }
